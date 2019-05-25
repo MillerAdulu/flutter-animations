@@ -24,9 +24,6 @@ class AnimateScreenState extends State<Animate> {
             floating: true,
             flexibleSpace: LayoutBuilder(
                 builder: (BuildContext context, BoxConstraints constraints) {
-              double percent = ((constraints.maxHeight - kToolbarHeight) *
-                  100 /
-                  (appBarHeight - kToolbarHeight));
               return Stack(
                 children: <Widget>[
                   Image.asset(
