@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/animation.dart';
 
 import 'dart:math';
-import 'dart:ui' show lerpDouble;
 
 void main() {
   runApp(MaterialApp(
@@ -22,9 +21,7 @@ class ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
   int dataSet = 50;
 
   AnimationController animation;
-  double startHeight;
-  double currentHeight;
-  double endHeight;
+  Tween<double> tween;
 
   @override
   void initState() {
@@ -33,15 +30,8 @@ class ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
     animation = AnimationController(
       duration: const Duration(microseconds: 300),
       vsync: this,
-    )..addListener(() {
-        setState(() {
-          currentHeight = lerpDouble(startHeight, endHeight, animation.value);
-        });
-      });
-
-    startHeight = 0.0;
-    currentHeight = 0.0;
-    endHeight = dataSet.toDouble();
+    );
+    tween = Tween<double>(begin: 0.0, end: dataSet.toDouble());
     animation.forward();
   }
 
@@ -54,8 +44,8 @@ class ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
   void changeData() {
     setState(() {
       dataSet = random.nextInt(100);
-      startHeight = currentHeight;
-      endHeight = dataSet.toDouble();
+      tween = Tween<double>(
+          begin: tween.evaluate(animation), end: dataSet.toDouble());
       animation.forward(from: 0.0);
     });
   }
@@ -65,7 +55,8 @@ class ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
     return Scaffold(
       body: Center(
         child: CustomPaint(
-            size: Size(200.0, 100.0), painter: BarChartPainter(currentHeight)),
+            size: Size(200.0, 100.0),
+            painter: BarChartPainter(tween.animate(animation))),
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.refresh),
@@ -77,11 +68,13 @@ class ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
 
 class BarChartPainter extends CustomPainter {
   static const barWidth = 10.0;
-  BarChartPainter(this.barHeight);
-  final double barHeight;
-
+  BarChartPainter(Animation<double> animation)
+      : animation = animation,
+        super(repaint: animation);
+  final Animation<double> animation;
   @override
   void paint(Canvas canvas, Size size) {
+    final barHeight = animation.value;
     final paint = Paint()
       ..color = Colors.blue[400]
       ..style = PaintingStyle.fill;
@@ -94,6 +87,6 @@ class BarChartPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(BarChartPainter old) {
-    return barHeight != old.barHeight;
+    return false;
   }
 }
