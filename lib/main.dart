@@ -3,11 +3,13 @@ import 'package:flutter/animation.dart';
 
 import 'dart:math';
 
+import 'package:animationapp/utils/routes.dart';
 import 'package:animationapp/bar.dart';
 
 void main() {
   runApp(MaterialApp(
     home: ChartPage(),
+    routes: routes,
   ));
 }
 
@@ -55,11 +57,18 @@ class ChartPageState extends State<ChartPage> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: CustomPaint(
-            size: Size(200.0, 100.0),
-            painter: BarChartPainter(tween.animate(animation))),
-      ),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: <Widget>[
+        Center(
+          child: CustomPaint(
+              size: Size(200.0, 100.0),
+              painter: BarChartPainter(tween.animate(animation))),
+        ),
+        RaisedButton(child: Text('Animate Screen'), onPressed: () {
+          Navigator.pushNamed(context, '/animate');
+        },)
+      ]),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.refresh),
         onPressed: changeData,
